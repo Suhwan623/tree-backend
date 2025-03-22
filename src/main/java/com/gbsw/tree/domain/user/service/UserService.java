@@ -29,7 +29,6 @@ public class UserService {
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .username(dto.getUsername())
                 .nickname(dto.getNickname())
-                .email(dto.getEmail())
                 .build();
 
         return userRepository.save(user);
@@ -45,7 +44,7 @@ public class UserService {
     public void UpdateUser(User user, UpdateUserDto dto) {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setNickname(dto.getNickname());
-        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getUsername());
 
         userRepository.save(user);
     }

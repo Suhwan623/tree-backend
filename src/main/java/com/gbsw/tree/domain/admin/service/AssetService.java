@@ -32,4 +32,10 @@ public class AssetService {
 
         return assetRepository.save(asset);
     }
+
+    public Long getAsset(String imgName, String type) {
+        Asset asset = assetRepository.findByImgNameAndType(imgName, type)
+                .orElseThrow(() -> new IllegalArgumentException("Asset not found with fileName: " + imgName + " and type: " + type));
+        return asset.getId();
+    }
 }

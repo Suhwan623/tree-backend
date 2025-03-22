@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostDto {
+    private Long id;
     private String imgName;
     private String senderName;
 }

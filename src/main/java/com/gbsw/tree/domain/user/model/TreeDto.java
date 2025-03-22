@@ -16,4 +16,5 @@ public class TreeDto {
     private List<String> treeInfo;
 
     private List<PostDto> posts;
+    private String nickname;
 }

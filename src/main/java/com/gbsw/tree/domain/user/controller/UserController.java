@@ -3,6 +3,7 @@ package com.gbsw.tree.domain.user.controller;
 import com.gbsw.tree.domain.post.db.PostRepository;
 import com.gbsw.tree.domain.post.model.MyPostDto;
 import com.gbsw.tree.domain.post.model.PostDto;
+import com.gbsw.tree.domain.user.filter.DataNotFoundException;
 import com.gbsw.tree.domain.user.model.*;
 import com.gbsw.tree.domain.user.db.UserRepository;
 import com.gbsw.tree.domain.user.service.UserService;
@@ -43,6 +44,7 @@ public class UserController {
         return ResponseEntity.ok(new CreateUserResult("ok", user.getUsername()));
     }
 
+
     @PatchMapping("/modify/{id}")
     public ResponseEntity<UpdateUserResult> updateUser(
             @PathVariable Long id,
@@ -57,7 +59,7 @@ public class UserController {
 
         userService.UpdateUser(user, dto);
 
-        return ResponseEntity.ok(new UpdateUserResult("ok", user.getEmail(), user.getNickname()));
+        return ResponseEntity.ok(new UpdateUserResult("ok", user.getUsername(), user.getNickname()));
     }
 
     @PostMapping("/tree")
@@ -84,12 +86,13 @@ public class UserController {
 
         List<PostDto> posts = postRepository.findAllByReceiver(user)
                 .stream()
-                .map(post -> new PostDto(post.getImgName(), post.getSenderName()))
+                .map(post -> new PostDto(post.getId(), post.getImgName(), post.getSenderName()))
                 .toList();
 
         TreeDto response = new TreeDto();
         response.setTreeInfo(treeInfo);
         response.setPosts(posts);
+        response.setNickname(user.getNickname());
 
         return ResponseEntity.ok(response);
     }
@@ -105,7 +108,7 @@ public class UserController {
 
         List<MyPostDto> myPosts = postRepository.findAllByReceiver(user)
                 .stream()
-                .map(myPost -> new MyPostDto(myPost.getImgName(), myPost.getSenderName(), myPost.getContent()))
+                .map(myPost -> new MyPostDto(myPost.getId() ,myPost.getImgName(), myPost.getSenderName(), myPost.getContent()))
                 .toList();
         MyTreeDto response  = new MyTreeDto();
         response.setTreeInfo(myTreeInfo);
@@ -113,4 +116,21 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/user/me")
+    public ResponseEntity<GetUserResult> getUserInfo(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new GetUserResult("User not authenticated", null, null));
+        }
+
+        try {
+            User user = userService.getUser(principal.getName());
+            return ResponseEntity.ok(new GetUserResult("ok", user.getNickname(), user.getId()));
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new GetUserResult("User not found", null, null));
+        }
+    }
 }
+

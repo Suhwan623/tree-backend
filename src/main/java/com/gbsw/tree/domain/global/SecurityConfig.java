@@ -12,6 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -27,11 +31,14 @@ public class SecurityConfig {
                 // CSRF 보호 비활성화
                 .csrf(csrf -> csrf.disable())
 
+                // CORS 설정 활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 // 요청별 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**",
-                                "/api/login/**", "/api/signup", "/api/image/**"
+                                "/api/login/**", "/api/signup", "/images/**"
                         ).permitAll() // 특정 경로 허용
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
@@ -51,5 +58,18 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용 (GET, POST 등)
+        configuration.addAllowedHeader("*"); // 모든 헤더 허용
+        configuration.setAllowCredentials(true); // 인증 정보(쿠키, Authorization 헤더) 허용
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 적용
+        return source;
     }
 }
