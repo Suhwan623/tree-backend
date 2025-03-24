@@ -63,10 +63,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
+
+        // 와일드카드로 서브도메인 허용
+        configuration.addAllowedOriginPattern("https://*.ssdw.store");
+        configuration.addAllowedOrigin("http://localhost:5173"); // 로컬 개발 환경
+
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true); // 주의: '*'와 함께 사용 시 충돌 가능
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
