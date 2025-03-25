@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**",
-                                "/api/login/**", "/api/signup", "/images/**"
+                                "/api/login/**", "/api/signup", "/api/images/**"
                         ).permitAll() // 특정 경로 허용
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
